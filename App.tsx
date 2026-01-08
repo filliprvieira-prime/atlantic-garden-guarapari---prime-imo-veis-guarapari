@@ -184,13 +184,13 @@ const App: React.FC = () => {
       {/* Navigation */}
       <nav className="fixed w-full z-50 bg-white/80 backdrop-blur-xl border-b border-slate-100">
         <div className="max-w-7xl mx-auto px-6 h-20 flex justify-between items-center">
-          <div className="flex items-center gap-3">
+          <a href="#" onClick={(e) => { e.preventDefault(); window.scrollTo({ top: 0, behavior: 'smooth' }); }} className="flex items-center gap-3 cursor-pointer">
             <div className="w-10 h-10 bg-custom-primary rounded-xl flex items-center justify-center text-white font-black text-xl shadow-lg shadow-custom-primary/20">A</div>
             <div className="flex flex-col">
               <span className="text-lg font-black tracking-tighter text-custom-primary uppercase leading-none">Atlantic Garden</span>
               <span className="text-[10px] uppercase tracking-[0.2em] text-custom-secondary font-bold">Guarapari • ES</span>
             </div>
-          </div>
+          </a>
           <div className="hidden md:flex gap-8 items-center font-bold text-xs uppercase tracking-widest text-slate-500">
             <a href="#sobre" onClick={() => handleNavClick('sobre')} className="hover:text-custom-primary transition-colors">O Bairro</a>
             <a href="#lazer" onClick={() => handleNavClick('lazer')} className="hover:text-custom-primary transition-colors">Lazer</a>

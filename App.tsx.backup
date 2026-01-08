@@ -10,35 +10,8 @@ import {
   Trees, 
   Heart, 
   Timer,
-  ExternalLink,
-  X,
-  Search,
-  Clock,
-  User,
-  Smartphone,
-  Globe,
-  Target,
-  RotateCcw,
-  ChevronRight
+  ExternalLink
 } from 'lucide-react';
-import {
-  trackPageView,
-  trackWhatsAppClick,
-  trackLeisureItemClick,
-  trackNavigationClick,
-  trackGalleryView,
-  trackLightboxOpen,
-  trackButtonClick,
-  getLeadCode,
-  saveLeadWithFormData,
-  searchLeadsByCode,
-  getRecentLeads,
-  getVisitCount,
-  isReturningVisitor
-} from './firebaseConfig';
-
-// Senha do painel admin
-const ADMIN_PASSWORD = 'prime2025';
 
 const App: React.FC = () => {
   const [formData, setFormData] = useState({ 
@@ -48,45 +21,9 @@ const App: React.FC = () => {
     message: '' 
   });
 
-  // Estados para Lightbox
-  const [lightboxOpen, setLightboxOpen] = useState(false);
-  const [lightboxImage, setLightboxImage] = useState('');
-  const [lightboxTitle, setLightboxTitle] = useState('');
-
-  // Estados para Admin Panel
-  const [showAdmin, setShowAdmin] = useState(false);
-  const [adminPassword, setAdminPassword] = useState('');
-  const [isAdminAuth, setIsAdminAuth] = useState(false);
-  const [leads, setLeads] = useState<any[]>([]);
-  const [searchCode, setSearchCode] = useState('');
-  const [selectedLead, setSelectedLead] = useState<any>(null);
-  const [loadingLeads, setLoadingLeads] = useState(false);
-
-  // Código do lead atual
-  const leadCode = getLeadCode();
-
   useEffect(() => {
     document.documentElement.style.setProperty('--primary-color', PAGE_CONFIG.theme.primary);
     document.documentElement.style.setProperty('--secondary-color', PAGE_CONFIG.theme.secondary);
-    
-    // Verificar se deve abrir painel admin
-    if (window.location.hash === '#admin') {
-      setShowAdmin(true);
-    }
-
-    // Track page view
-    trackPageView('home');
-  }, []);
-
-  // Fechar lightbox com ESC
-  useEffect(() => {
-    const handleEsc = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        setLightboxOpen(false);
-      }
-    };
-    window.addEventListener('keydown', handleEsc);
-    return () => window.removeEventListener('keydown', handleEsc);
   }, []);
 
   const getDriveUrl = (id: string) => {
@@ -94,72 +31,13 @@ const App: React.FC = () => {
     return `https://drive.google.com/thumbnail?id=${id}&sz=w2000`;
   };
 
-  // Abrir Lightbox
-  const openLightbox = (imageUrl: string, title: string) => {
-    setLightboxImage(imageUrl);
-    setLightboxTitle(title);
-    setLightboxOpen(true);
-    trackLightboxOpen('galeria', title);
-  };
-
-  // Handler de WhatsApp com tracking
-  const handleWhatsAppClick = async (location: string) => {
-    trackButtonClick('whatsapp', location);
-    await trackWhatsAppClick(location);
-  };
-
-  // Handler de navegação com tracking
-  const handleNavClick = (section: string) => {
-    trackNavigationClick(section);
-  };
-
-  // Handler de item de lazer
-  const handleLeisureClick = (itemName: string) => {
-    trackLeisureItemClick(itemName);
-  };
-
-  // Admin: Login
-  const handleAdminLogin = () => {
-    if (adminPassword === ADMIN_PASSWORD) {
-      setIsAdminAuth(true);
-      loadLeads();
-    } else {
-      alert('Senha incorreta!');
-    }
-  };
-
-  // Admin: Carregar leads
-  const loadLeads = async () => {
-    setLoadingLeads(true);
-    const recentLeads = await getRecentLeads(50);
-    setLeads(recentLeads);
-    setLoadingLeads(false);
-  };
-
-  // Admin: Buscar por código
-  const handleSearchByCode = async () => {
-    if (!searchCode.trim()) {
-      loadLeads();
-      return;
-    }
-    setLoadingLeads(true);
-    const results = await searchLeadsByCode(searchCode);
-    setLeads(results);
-    setLoadingLeads(false);
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    
-    // Salvar lead com dados do formulário
-    const code = await saveLeadWithFormData({ name: formData.name, phone: formData.phone });
-    
-    const message = `Olá! Sou ${formData.name} 👋\n\n` +
-                    `Tenho interesse no Atlantic Garden!\n\n` +
-                    `📱 Meu telefone: ${formData.phone}\n` +
-                    `📧 E-mail: ${formData.email}\n` +
-                    `🏷️ Código: ${code || leadCode}\n\n` +
-                    `Mensagem: ${formData.message}`;
+    const message = `*Novo Contato - Atlantic Garden*\n\n` +
+                    `*Nome:* ${formData.name}\n` +
+                    `*E-mail:* ${formData.email}\n` +
+                    `*WhatsApp:* ${formData.phone}\n` +
+                    `*Mensagem:* ${formData.message}`;
     const whatsappUrl = `https://wa.me/${PAGE_CONFIG.contact.whatsapp}?text=${encodeURIComponent(message)}`;
     window.open(whatsappUrl, '_blank');
     setFormData({ name: '', email: '', phone: '', message: '' });
@@ -192,11 +70,11 @@ const App: React.FC = () => {
             </div>
           </div>
           <div className="hidden md:flex gap-8 items-center font-bold text-xs uppercase tracking-widest text-slate-500">
-            <a href="#sobre" onClick={() => handleNavClick('sobre')} className="hover:text-custom-primary transition-colors">O Bairro</a>
-            <a href="#lazer" onClick={() => handleNavClick('lazer')} className="hover:text-custom-primary transition-colors">Lazer</a>
-            <a href="#infra" onClick={() => handleNavClick('infra')} className="hover:text-custom-primary transition-colors">Infra</a>
-            <a href="#localizacao" onClick={() => handleNavClick('localizacao')} className="hover:text-custom-primary transition-colors">Localização</a>
-            <a href={PAGE_CONFIG.contact.directWhatsappLink} onClick={() => handleWhatsAppClick('nav')} target="_blank" rel="noopener noreferrer" className="bg-custom-primary text-white px-6 py-3 rounded-full hover:bg-custom-secondary transition-all">Quero Saber Mais</a>
+            <a href="#sobre" className="hover:text-custom-primary transition-colors">O Bairro</a>
+            <a href="#lazer" className="hover:text-custom-primary transition-colors">Lazer</a>
+            <a href="#infra" className="hover:text-custom-primary transition-colors">Infra</a>
+            <a href="#localizacao" className="hover:text-custom-primary transition-colors">Localização</a>
+            <a href={PAGE_CONFIG.contact.directWhatsappLink} target="_blank" rel="noopener noreferrer" className="bg-custom-primary text-white px-6 py-3 rounded-full hover:bg-custom-secondary transition-all">Quero Saber Mais</a>
           </div>
         </div>
       </nav>
@@ -226,10 +104,10 @@ const App: React.FC = () => {
               {PAGE_CONFIG.hero.subtitle}
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
-              <a href={PAGE_CONFIG.contact.directWhatsappLink} onClick={() => handleWhatsAppClick('hero')} target="_blank" rel="noopener noreferrer" className="bg-white text-custom-primary px-10 py-5 rounded-full text-sm font-black uppercase tracking-widest hover:bg-custom-secondary hover:text-white transition-all shadow-2xl shadow-black/20 text-center">
+              <a href={PAGE_CONFIG.contact.directWhatsappLink} target="_blank" rel="noopener noreferrer" className="bg-white text-custom-primary px-10 py-5 rounded-full text-sm font-black uppercase tracking-widest hover:bg-custom-secondary hover:text-white transition-all shadow-2xl shadow-black/20 text-center">
                 {PAGE_CONFIG.hero.ctaPrimary}
               </a>
-              <a href="#lazer" onClick={() => handleNavClick('lazer')} className="bg-custom-primary/30 backdrop-blur-md border border-white/30 text-white px-10 py-5 rounded-full text-sm font-black uppercase tracking-widest hover:bg-white/10 transition-all text-center">
+              <a href="#lazer" className="bg-custom-primary/30 backdrop-blur-md border border-white/30 text-white px-10 py-5 rounded-full text-sm font-black uppercase tracking-widest hover:bg-white/10 transition-all text-center">
                 {PAGE_CONFIG.hero.ctaSecondary}
               </a>
             </div>
@@ -275,14 +153,7 @@ const App: React.FC = () => {
         <div className="flex flex-col gap-12">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {PAGE_CONFIG.lazer.galleryDriveIds.map((id, idx) => (
-              <div 
-                key={idx} 
-                className="relative rounded-[40px] overflow-hidden shadow-xl aspect-[4/3] bg-white group hover:shadow-2xl transition-all duration-500 cursor-pointer"
-                onClick={() => {
-                  trackGalleryView(`Lazer ${idx + 1}`);
-                  openLightbox(getDriveUrl(id), `Lazer ${idx + 1}`);
-                }}
-              >
+              <div key={idx} className="relative rounded-[40px] overflow-hidden shadow-xl aspect-[4/3] bg-white group hover:shadow-2xl transition-all duration-500">
                 <img src={getDriveUrl(id)} alt={`Lazer ${idx + 1}`} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" referrerPolicy="no-referrer" />
               </div>
             ))}
@@ -291,11 +162,7 @@ const App: React.FC = () => {
             {AMENITIES.map((amenity, idx) => {
               const Icon = IconMap[amenity.icon] || Heart;
               return (
-                <div 
-                  key={idx} 
-                  className="group p-6 bg-white border border-slate-100 rounded-[35px] text-center hover:bg-custom-primary transition-all duration-500 shadow-sm hover:shadow-lg cursor-pointer"
-                  onClick={() => handleLeisureClick(amenity.title)}
-                >
+                <div key={idx} className="group p-6 bg-white border border-slate-100 rounded-[35px] text-center hover:bg-custom-primary transition-all duration-500 shadow-sm hover:shadow-lg">
                   <div className="w-12 h-12 mx-auto mb-4 bg-slate-50 rounded-xl flex items-center justify-center text-custom-primary group-hover:bg-custom-secondary group-hover:text-white transition-all"><Icon size={24} /></div>
                   <h4 className="font-black text-slate-800 text-[10px] group-hover:text-white uppercase tracking-widest">{amenity.title}</h4>
                 </div>
@@ -409,222 +276,16 @@ const App: React.FC = () => {
         <div className="flex items-center justify-center gap-4 mb-8"><div className="w-14 h-14 bg-custom-primary rounded-2xl flex items-center justify-center text-white font-black text-3xl">A</div><p className="font-black text-custom-primary uppercase tracking-tighter text-2xl">Atlantic Garden</p></div>
         <p className="text-[11px] uppercase tracking-[0.3em] text-slate-300 font-black mb-2">Loteamento Registrado na Matrícula 71.676 - Guarapari - ES</p>
         <p className="text-[9px] uppercase tracking-widest text-slate-400 font-medium">© {new Date().getFullYear()} Prime Guarapari & CBL Lotes.</p>
-        <p className="text-[10px] text-slate-400 mt-4">Seu código: <span className="font-bold text-custom-secondary">{leadCode}</span></p>
       </footer>
 
       {/* Floating WhatsApp Button */}
       <a 
         href={PAGE_CONFIG.contact.directWhatsappLink}
-        onClick={() => handleWhatsAppClick('float')}
         target="_blank" rel="noopener noreferrer"
         className="fixed bottom-10 right-10 z-50 bg-[#25D366] text-white p-6 rounded-full shadow-2xl hover:scale-110 transition-all hover:rotate-12"
       >
         <MessageCircle size={36} />
       </a>
-
-      {/* Premium Lightbox */}
-      {lightboxOpen && (
-        <div 
-          className="fixed inset-0 z-[100] flex items-center justify-center bg-black/90 backdrop-blur-xl"
-          onClick={() => setLightboxOpen(false)}
-        >
-          <button 
-            className="absolute top-6 right-6 text-white/80 hover:text-white transition-colors z-10"
-            onClick={() => setLightboxOpen(false)}
-          >
-            <X size={32} />
-          </button>
-          <div className="absolute top-6 left-6 bg-custom-primary/90 px-4 py-2 rounded-full">
-            <span className="text-white text-sm font-bold">Atlantic Garden</span>
-          </div>
-          <div className="max-w-[90vw] max-h-[90vh]" onClick={e => e.stopPropagation()}>
-            <img 
-              src={lightboxImage} 
-              alt={lightboxTitle}
-              className="max-w-full max-h-[85vh] object-contain rounded-2xl shadow-2xl"
-            />
-            <p className="text-center text-white/70 mt-4 text-sm font-medium">{lightboxTitle}</p>
-          </div>
-        </div>
-      )}
-
-      {/* Admin Panel */}
-      {showAdmin && (
-        <div className="fixed inset-0 z-[200] bg-slate-900/95 backdrop-blur-xl overflow-auto">
-          <div className="max-w-6xl mx-auto p-8">
-            <div className="flex justify-between items-center mb-8">
-              <h1 className="text-3xl font-black text-white">Painel Admin - Atlantic Garden</h1>
-              <button 
-                onClick={() => { setShowAdmin(false); window.location.hash = ''; }}
-                className="text-white/60 hover:text-white transition-colors"
-              >
-                <X size={32} />
-              </button>
-            </div>
-
-            {!isAdminAuth ? (
-              <div className="max-w-md mx-auto bg-slate-800 p-8 rounded-2xl">
-                <h2 className="text-xl font-bold text-white mb-6">Digite a senha</h2>
-                <input
-                  type="password"
-                  value={adminPassword}
-                  onChange={e => setAdminPassword(e.target.value)}
-                  onKeyDown={e => e.key === 'Enter' && handleAdminLogin()}
-                  className="w-full px-4 py-3 bg-slate-700 text-white rounded-xl mb-4"
-                  placeholder="Senha do admin"
-                />
-                <button
-                  onClick={handleAdminLogin}
-                  className="w-full py-3 bg-custom-primary text-white rounded-xl font-bold hover:bg-custom-secondary transition-colors"
-                >
-                  Entrar
-                </button>
-              </div>
-            ) : (
-              <div>
-                {/* Busca */}
-                <div className="flex gap-4 mb-8">
-                  <div className="flex-1 relative">
-                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={20} />
-                    <input
-                      type="text"
-                      value={searchCode}
-                      onChange={e => setSearchCode(e.target.value.toUpperCase())}
-                      onKeyDown={e => e.key === 'Enter' && handleSearchByCode()}
-                      className="w-full pl-12 pr-4 py-3 bg-slate-800 text-white rounded-xl"
-                      placeholder="Buscar por código (ex: A3B7X2)"
-                    />
-                  </div>
-                  <button
-                    onClick={handleSearchByCode}
-                    className="px-6 py-3 bg-custom-primary text-white rounded-xl font-bold hover:bg-custom-secondary transition-colors"
-                  >
-                    Buscar
-                  </button>
-                  <button
-                    onClick={loadLeads}
-                    className="px-6 py-3 bg-slate-700 text-white rounded-xl font-bold hover:bg-slate-600 transition-colors"
-                  >
-                    <RotateCcw size={20} />
-                  </button>
-                </div>
-
-                {/* Lista de Leads */}
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                  <div className="bg-slate-800 rounded-2xl p-6 max-h-[70vh] overflow-auto">
-                    <h3 className="text-lg font-bold text-white mb-4">Leads Recentes</h3>
-                    {loadingLeads ? (
-                      <p className="text-slate-400">Carregando...</p>
-                    ) : leads.length === 0 ? (
-                      <p className="text-slate-400">Nenhum lead encontrado</p>
-                    ) : (
-                      <div className="space-y-3">
-                        {leads.map((lead, idx) => (
-                          <div
-                            key={idx}
-                            onClick={() => setSelectedLead(lead)}
-                            className={`p-4 rounded-xl cursor-pointer transition-colors ${selectedLead?.id === lead.id ? 'bg-custom-primary' : 'bg-slate-700 hover:bg-slate-600'}`}
-                          >
-                            <div className="flex justify-between items-start">
-                              <div>
-                                <p className="font-bold text-white">{lead.leadCode}</p>
-                                <p className="text-sm text-slate-300">{lead.nomeCliente || 'Sem nome'}</p>
-                              </div>
-                              <div className="text-right">
-                                <p className="text-xs text-slate-400">{lead.device}</p>
-                                {lead.isReturningVisitor && (
-                                  <span className="text-xs bg-green-500 text-white px-2 py-1 rounded-full">Retorno</span>
-                                )}
-                              </div>
-                            </div>
-                            <div className="flex gap-4 mt-2 text-xs text-slate-400">
-                              <span className="flex items-center gap-1"><Clock size={12} /> {lead.totalTimeFormatted}</span>
-                              <span className="flex items-center gap-1"><Target size={12} /> {lead.resumo?.nivelInteresse || 0}%</span>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Detalhes do Lead */}
-                  <div className="bg-slate-800 rounded-2xl p-6 max-h-[70vh] overflow-auto">
-                    <h3 className="text-lg font-bold text-white mb-4">Detalhes</h3>
-                    {selectedLead ? (
-                      <div className="space-y-4">
-                        <div className="bg-slate-700 p-4 rounded-xl">
-                          <p className="text-xs text-slate-400 mb-1">Código</p>
-                          <p className="text-2xl font-black text-custom-secondary">{selectedLead.leadCode}</p>
-                        </div>
-                        
-                        {selectedLead.nomeCliente && (
-                          <div className="bg-slate-700 p-4 rounded-xl">
-                            <p className="text-xs text-slate-400 mb-1">Cliente</p>
-                            <p className="text-white font-bold">{selectedLead.nomeCliente}</p>
-                            <p className="text-slate-300">{selectedLead.telefoneCliente}</p>
-                          </div>
-                        )}
-
-                        <div className="grid grid-cols-2 gap-4">
-                          <div className="bg-slate-700 p-4 rounded-xl">
-                            <p className="text-xs text-slate-400 mb-1">Tempo no Site</p>
-                            <p className="text-white font-bold">{selectedLead.totalTimeFormatted}</p>
-                          </div>
-                          <div className="bg-slate-700 p-4 rounded-xl">
-                            <p className="text-xs text-slate-400 mb-1">Score de Interesse</p>
-                            <p className="text-white font-bold">{selectedLead.resumo?.nivelInteresse || 0}%</p>
-                          </div>
-                        </div>
-
-                        <div className="bg-slate-700 p-4 rounded-xl">
-                          <p className="text-xs text-slate-400 mb-1">Dispositivo</p>
-                          <p className="text-white">{selectedLead.device} • {selectedLead.browser}</p>
-                          <p className="text-slate-400 text-sm">{selectedLead.screenSize}</p>
-                        </div>
-
-                        <div className="bg-slate-700 p-4 rounded-xl">
-                          <p className="text-xs text-slate-400 mb-1">Origem</p>
-                          <p className="text-white">{selectedLead.utmSource || selectedLead.referrer || 'Acesso direto'}</p>
-                        </div>
-
-                        {selectedLead.leisureItemsClicked?.length > 0 && (
-                          <div className="bg-slate-700 p-4 rounded-xl">
-                            <p className="text-xs text-slate-400 mb-2">Itens de Lazer Clicados</p>
-                            <div className="flex flex-wrap gap-2">
-                              {selectedLead.leisureItemsClicked.map((item: string, i: number) => (
-                                <span key={i} className="bg-custom-secondary/20 text-custom-secondary px-2 py-1 rounded-lg text-xs">{item}</span>
-                              ))}
-                            </div>
-                          </div>
-                        )}
-
-                        {selectedLead.timeline?.length > 0 && (
-                          <div className="bg-slate-700 p-4 rounded-xl">
-                            <p className="text-xs text-slate-400 mb-2">Timeline de Ações</p>
-                            <div className="space-y-2 max-h-48 overflow-auto">
-                              {selectedLead.timeline.slice(-10).reverse().map((event: any, i: number) => (
-                                <div key={i} className="flex items-start gap-2 text-sm">
-                                  <ChevronRight size={14} className="text-custom-secondary mt-1" />
-                                  <div>
-                                    <span className="text-white">{event.action}</span>
-                                    {event.details && <span className="text-slate-400"> - {event.details}</span>}
-                                  </div>
-                                </div>
-                              ))}
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                    ) : (
-                      <p className="text-slate-400">Selecione um lead para ver detalhes</p>
-                    )}
-                  </div>
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
-      )}
     </div>
   );
 };

@@ -107,7 +107,7 @@ export const PAGE_CONFIG = {
     phone: '(27) 99897-0484',
     email: 'prime@primeguarapari.com.br',
     whatsapp: '5527998970484',
-    directWhatsappLink: 'https://w.app/primeimoveisguarapari',
+    directWhatsappLink: 'https://wa.me/5527998970484?text=Ol%C3%A1%2C%20gostaria%20de%20saber%20mais%20informa%C3%A7%C3%B5es%20sobre%20o%20Condom%C3%ADnio%20Atlantic%20Garden%20em%20Guarapari.',
     whatsappMessage: 'Olá! 👋 Vi o site do Atlantic Garden e gostaria de agendar uma visita.',
     locationLabel: 'Local do Loteamento',
     locationAddress: 'Lagoa Funda, Guarapari',

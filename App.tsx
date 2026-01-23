@@ -148,15 +148,8 @@ const App: React.FC = () => {
     setLoadingLeads(false);
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    
-    // Salvar lead com dados do formulário (não bloqueia se falhar)
-    try {
-      await saveLeadWithFormData({ name: formData.name, phone: formData.phone });
-    } catch (error) {
-      console.error('Erro ao salvar lead:', error);
-    }
     
     // Mensagem padrão fixa + dados do formulário
     let message = `Olá! Tenho interesse no Condomínio Atlantic Garden em Guarapari que encontrei no Google. Poderia me passar mais informações, por favor?\n\n` +
@@ -169,8 +162,12 @@ const App: React.FC = () => {
     }
     
     const whatsappUrl = `https://wa.me/5527998970484?text=${encodeURIComponent(message)}`;
-    window.open(whatsappUrl, '_blank');
-    setFormData({ name: '', email: '', phone: '', message: '' });
+    
+    // Salvar lead em background (não bloqueia)
+    saveLeadWithFormData({ name: formData.name, phone: formData.phone }).catch(console.error);
+    
+    // Redireciona para WhatsApp
+    window.location.href = whatsappUrl;
   };
 
   return (

@@ -152,16 +152,19 @@ const App: React.FC = () => {
     e.preventDefault();
     
     // Salvar lead com dados do formulário
-    const code = await saveLeadWithFormData({ name: formData.name, phone: formData.phone });
+    await saveLeadWithFormData({ name: formData.name, phone: formData.phone });
     
-    const message = `Olá! Tenho interesse no Condomínio Atlantic Garden em Guarapari que encontrei no Google. Poderia me passar mais informações, por favor?\n\n` +
-                    `📋 Meus dados:\n` +
-                    `👤 Nome: ${formData.name}\n` +
-                    `📱 Telefone: ${formData.phone}\n` +
-                    `📧 E-mail: ${formData.email}\n` +
-                    `🏷️ Código: ${code || leadCode}\n\n` +
-                    `💬 Mensagem: ${formData.message}`;
-    const whatsappUrl = `https://wa.me/${PAGE_CONFIG.contact.whatsapp}?text=${encodeURIComponent(message)}`;
+    // Mensagem padrão fixa + dados do formulário
+    let message = `Olá! Tenho interesse no Condomínio Atlantic Garden em Guarapari que encontrei no Google. Poderia me passar mais informações, por favor?\n\n` +
+                  `👤 Nome: ${formData.name}\n` +
+                  `📱 Telefone: ${formData.phone}`;
+    
+    // Adiciona mensagem do usuário se houver
+    if (formData.message && formData.message.trim()) {
+      message += `\n\n💬 Mensagem: ${formData.message}`;
+    }
+    
+    const whatsappUrl = `https://wa.me/5527998970484?text=${encodeURIComponent(message)}`;
     window.open(whatsappUrl, '_blank');
     setFormData({ name: '', email: '', phone: '', message: '' });
   };
@@ -350,10 +353,10 @@ const App: React.FC = () => {
             <div className="bg-custom-primary p-12 md:p-20 text-white lg:w-1/2 flex flex-col justify-center border-b lg:border-b-0 lg:border-r border-white/10">
               <h2 className="text-4xl md:text-5xl font-black uppercase leading-tight tracking-tighter mb-16">{PAGE_CONFIG.contact.title}</h2>
               <div className="flex flex-col gap-12">
-                <div className="flex items-center gap-6">
+                <a href="https://wa.me/5527998970484?text=Ol%C3%A1%21%20Tenho%20interesse%20no%20Condom%C3%ADnio%20Atlantic%20Garden%20em%20Guarapari%20que%20encontrei%20no%20Google.%20Poderia%20me%20passar%20mais%20informa%C3%A7%C3%B5es%2C%20por%20favor%3F" target="_blank" rel="noopener noreferrer" className="flex items-center gap-6 hover:opacity-80 transition-opacity cursor-pointer">
                   <div className="w-16 h-16 bg-white/10 rounded-[22px] flex items-center justify-center shrink-0"><Phone size={32} /></div>
                   <div><p className="text-[10px] uppercase font-black opacity-60 tracking-[0.3em] mb-1">Telefone</p><p className="text-2xl md:text-3xl font-black whitespace-nowrap">{PAGE_CONFIG.contact.phone}</p></div>
-                </div>
+                </a>
                 <div className="flex items-center gap-6">
                   <div className="w-16 h-16 bg-white/10 rounded-[22px] flex items-center justify-center shrink-0"><Mail size={32} /></div>
                   <div className="min-w-0 flex-1"><p className="text-[10px] uppercase font-black opacity-60 tracking-[0.3em] mb-1">E-mail</p><p className="text-sm font-bold truncate">{PAGE_CONFIG.contact.email}</p></div>

@@ -154,12 +154,13 @@ const App: React.FC = () => {
     // Salvar lead com dados do formulário
     const code = await saveLeadWithFormData({ name: formData.name, phone: formData.phone });
     
-    const message = `Olá! Sou ${formData.name} 👋\n\n` +
-                    `Tenho interesse no Atlantic Garden!\n\n` +
-                    `📱 Meu telefone: ${formData.phone}\n` +
+    const message = `Olá! Tenho interesse no Condomínio Atlantic Garden em Guarapari que encontrei no Google. Poderia me passar mais informações, por favor?\n\n` +
+                    `📋 Meus dados:\n` +
+                    `👤 Nome: ${formData.name}\n` +
+                    `📱 Telefone: ${formData.phone}\n` +
                     `📧 E-mail: ${formData.email}\n` +
                     `🏷️ Código: ${code || leadCode}\n\n` +
-                    `Mensagem: ${formData.message}`;
+                    `💬 Mensagem: ${formData.message}`;
     const whatsappUrl = `https://wa.me/${PAGE_CONFIG.contact.whatsapp}?text=${encodeURIComponent(message)}`;
     window.open(whatsappUrl, '_blank');
     setFormData({ name: '', email: '', phone: '', message: '' });
@@ -364,9 +365,9 @@ const App: React.FC = () => {
                 <input type="text" placeholder="Seu Nome Completo" required className="w-full px-10 py-6 bg-slate-50 border-2 border-transparent rounded-full focus:border-custom-primary focus:bg-white focus:outline-none transition-all placeholder:text-slate-400 font-medium text-lg" value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} />
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                   <input type="tel" placeholder="WhatsApp" required className="w-full px-10 py-6 bg-slate-50 border-2 border-transparent rounded-full focus:border-custom-primary focus:bg-white focus:outline-none transition-all placeholder:text-slate-400 font-medium text-lg" value={formData.phone} onChange={e => setFormData({...formData, phone: e.target.value})} />
-                  <input type="email" placeholder="Seu E-mail" required className="w-full px-10 py-6 bg-slate-50 border-2 border-transparent rounded-full focus:border-custom-primary focus:bg-white focus:outline-none transition-all placeholder:text-slate-400 font-medium text-lg" value={formData.email} onChange={e => setFormData({...formData, email: e.target.value})} />
+                  <input type="email" placeholder="Seu E-mail" className="w-full px-10 py-6 bg-slate-50 border-2 border-transparent rounded-full focus:border-custom-primary focus:bg-white focus:outline-none transition-all placeholder:text-slate-400 font-medium text-lg" value={formData.email} onChange={e => setFormData({...formData, email: e.target.value})} />
                 </div>
-                <textarea placeholder="Como podemos ajudar?" rows={4} required className="w-full px-10 py-8 bg-slate-50 border-2 border-transparent rounded-[40px] focus:border-custom-primary focus:bg-white focus:outline-none transition-all resize-none placeholder:text-slate-400 font-medium text-lg" value={formData.message} onChange={e => setFormData({...formData, message: e.target.value})}></textarea>
+                <textarea placeholder="Como podemos ajudar?" rows={4} className="w-full px-10 py-8 bg-slate-50 border-2 border-transparent rounded-[40px] focus:border-custom-primary focus:bg-white focus:outline-none transition-all resize-none placeholder:text-slate-400 font-medium text-lg" value={formData.message} onChange={e => setFormData({...formData, message: e.target.value})}></textarea>
                 <button type="submit" className="w-full py-8 bg-custom-primary text-white rounded-full font-black uppercase tracking-[0.4em] hover:bg-custom-secondary transition-all flex items-center justify-center gap-5 text-sm shadow-2xl shadow-custom-primary/30 transform hover:-translate-y-1 active:scale-95">Solicitar Contato <Send size={22} /></button>
               </form>
             </div>

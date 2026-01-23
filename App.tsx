@@ -151,8 +151,12 @@ const App: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Salvar lead com dados do formulário
-    await saveLeadWithFormData({ name: formData.name, phone: formData.phone });
+    // Salvar lead com dados do formulário (não bloqueia se falhar)
+    try {
+      await saveLeadWithFormData({ name: formData.name, phone: formData.phone });
+    } catch (error) {
+      console.error('Erro ao salvar lead:', error);
+    }
     
     // Mensagem padrão fixa + dados do formulário
     let message = `Olá! Tenho interesse no Condomínio Atlantic Garden em Guarapari que encontrei no Google. Poderia me passar mais informações, por favor?\n\n` +
